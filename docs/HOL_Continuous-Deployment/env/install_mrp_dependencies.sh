@@ -29,12 +29,8 @@ do
     sleep 2
 done
 
-log "Installs newer versions of the packages ..."
-until apt-get --yes upgrade > /dev/null 2>&1
-do
-    log "Lock detected on apt-get while install Try again..."
-    sleep 2
-done
+#log "Installs newer versions of the packages ..."
+# apt-get upgrade -y
 
 log "Install openjdk-8-jdk ..."
 until apt-get --yes install openjdk-8-jdk > /dev/null 2>&1
