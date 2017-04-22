@@ -6,6 +6,18 @@ function log()
   logger -t "${BASH_SCRIPT}" "${mess}"
 }
 
+# print commands and arguments as they are executed
+set -x
+
+echo "initializing mrp installation"
+date
+ps axjf
+
+CWD="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
+
+log "CustomScript Directory is ${CWD}" "N"
+
+# Parameters
 BASH_SCRIPT="${0}"
 
 # Install PartsUnlimitedMRP dependencies
