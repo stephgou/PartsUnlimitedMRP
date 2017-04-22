@@ -6,6 +6,8 @@ function log()
   logger -t "${BASH_SCRIPT}" "${mess}"
 }
 
+BASH_SCRIPT="${0}"
+
 # Install PartsUnlimitedMRP dependencies
 
 log "Update the list of available packages and their versions ..."
