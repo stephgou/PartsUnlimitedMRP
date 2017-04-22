@@ -9,21 +9,22 @@
         "description": "User name for the MRP Virtual Machine."
       }
     },
-    "mrpAdminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password for the MRP Virtual Machine."
-      }
-    },
     "mrpDnsNameForPublicIP": {
       "type": "string",
       "minLength": 1,
       "metadata": {
         "description": "Globally unique DNS Name for the Public IP used to access the MRP Virtual Machine."
       }
+    },
+    "adminPublicKey": { 
+        "type": "string",
+        "metadata": {
+            "description": "SSH rsa public key file as a string"
+        }
     }
   },
   "variables": {
+    "apiVersion": "2015-06-15",
     "mrpImagePublisher": "Canonical",
     "mrpImageOffer": "UbuntuServer",
     "mrpImageSku": "16.04.0-LTS",
@@ -41,7 +42,12 @@
     "virtualNetworkName": "mrpVNET",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "storageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]"
+    "storageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
+    "sshKeyPath": "[concat('/home/',parameters('mrpAdminUsername'),'/.ssh/authorized_keys')]",
+    "customScript": {
+        "fileUris": "https://raw.githubusercontent.com/stephgou/PartsUnlimitedMRP/master/docs/HOL_Continuous-Deployment/env/install_mrp_dependencies.sh",
+        "commandToExecute": "bash install_mrp_dependencies.sh"
+    }
   },
   "resources": [
     {
@@ -202,7 +208,17 @@
         "osProfile": {
           "computerName": "[variables('mrpVmName')]",
           "adminUsername": "[parameters('mrpAdminUsername')]",
-          "adminPassword": "[parameters('mrpAdminPassword')]"
+          "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                  "publicKeys": [
+                      {
+                          "path": "[variables('sshKeyPath')]",
+                          "keyData": "[parameters('adminPublicKey')]"
+                      }
+                  ]
+              }
+          }
         },
         "storageProfile": {
           "imageReference": {
@@ -238,23 +254,19 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('mrpVmName'),'/mrpsetup')]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('mrpVmName'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.OSTCExtensions",
-        "type": "CustomScriptForLinux",
-        "typeHandlerVersion": "1.4",
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": [
-            "https://raw.githubusercontent.com/Microsoft/PartsUnlimitedMRP/master/docs/HOL_Continuous-Deployment/env/install_mrp_dependencies.sh"
-          ],
-          "commandToExecute": "bash install_mrp_dependencies.sh"
-        },
-        "protectedSettings": {
+          "fileUris": "[split(variables('customScript').fileUris, ' ')]",
+          "commandToExecute": "[variables('customScript').commandToExecute]"
         }
       }
     }
