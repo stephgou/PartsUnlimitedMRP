@@ -74,7 +74,9 @@ do
     sleep 2
 done
 
-
+# In Release Management PowerShell Script use a Sudo Command through a plink call (without tty)
+log "Remove requiretty in /etc/sudoers" "N"
+sed -i 's/Defaults    requiretty/Defaults    !requiretty/g' /etc/sudoers
 
 # Set Java environment variables
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
