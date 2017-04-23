@@ -57,4 +57,4 @@ Set-Content -Path $plinkFile -Value $plinkContent
 
 # Copy files and execute MRP deployment shell script
 echo n | & .\psftp.exe $sshUser@$sshTarget -pw $sshPassword -b $sftpFile 
-echo n | & .\plink.exe $sshUser@$sshTarget -pw $sshPassword -m $plinkFile -batch
+echo y | & .\plink.exe $sshUser@$sshTarget -pw $sshPassword -m $plinkFile
