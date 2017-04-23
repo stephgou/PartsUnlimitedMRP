@@ -56,5 +56,9 @@ $plinkContent = $plinkContent.Replace('ROOT_DEPLOY_DIRECTORY',$deployDirectory)
 Set-Content -Path $plinkFile -Value $plinkContent
 
 # Copy files and execute MRP deployment shell script
-echo n | & .\psftp.exe $sshUser@$sshTarget -pw $sshPassword -b $sftpFile 
-echo y | & .\plink.exe $sshUser@$sshTarget -pw $sshPassword -m $plinkFile
+echo n | & .\psftp.exe $sshUser@$sshTarget -pw $sshPassword -b $sftpFile
+
+#Push a "y" to overcome ssh host key challenge
+echo y | & .\plink.exe $sshUser@$sshTarget -pw $sshPassword "exit"
+
+.\plink.exe $sshUser@$sshTarget -pw $sshPassword -m $plinkFile
