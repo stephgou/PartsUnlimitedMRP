@@ -79,7 +79,7 @@ log "Adding the Remove requiretty in /etc/sudoers" "N"
 #changing the value if the line was already there
 #sed -i 's/Defaults    requiretty/Defaults    !requiretty/g' /etc/sudoers
 #adding the line if it was not already there
-printf "Defaults    !requiretty" >> "/etc/sudoers"
+printf "Defaults    !requiretty\n" >> "/etc/sudoers"
 
 # Set Java environment variables
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
